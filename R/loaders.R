@@ -36,10 +36,10 @@
 #'loadFactors('./data/factors.tbl')
 #'loadFactors('mydata/myfactorsTable.txt')
 #'@seealso [modRIPseq::splitAndBuildDEobjs()] which follows this function in the modRIPseq pipeline
-loadFactors <- function(filepath='./data/factors.tbl'){
+loadFactors <- function(filepath=system.file(package='modRIPseq',"extdata","factorsAll.tbl")){
   dir <- dirname(filepath)
-  factorTbl <- read_table(filepath)
-  for (i in seq_along(factorTbl)) factorTbl[[i]] <- as_factor(factorTbl[[i]])
+  factorTbl <- tidyverse::read_table(filepath)
+  for (i in seq_along(factorTbl)) factorTbl[[i]] <- tidyverse::as_factor(factorTbl[[i]])
   factorTbl$file <- file.path(dir,factorTbl$file)
   return(factorTbl)
 }
@@ -163,7 +163,7 @@ checkRowNaming <- function(txobj,filelist){
 #'@seealso [modRIPseq::loadFileList()]
 #'@seealso [modRIPseq::loadFactors()]
 reorderFactorsByFile <- function(factortibble=factorTbl,filecol=file,filelist=fileList){
-  factortibble <- factortibble %>% arrange(factor({{filecol}},levels=filelist))
+  factortibble <- factortibble %>% tidyverse::arrange(factor({{filecol}},levels=filelist))
   return(factortibble)
 }
 
@@ -221,21 +221,21 @@ setDDSnamesDose <- function(factortibble = factorTbl){
   #namelist[["Input"]] <- "Input"
   #namelist[["IP_control"]] <- "IP_control"
   uniqentries <- factortibble %>%
-    filter(abTreatment=="none") %>%
-    distinct() %>%
-    select(exposureLevel) %>%
-    as_vector %>%
+    tidyverse::filter(abTreatment=="none") %>%
+    tidyverse::distinct() %>%
+    tidyverse::select(exposureLevel) %>%
+    tidyverse::as_vector %>%
     as.character()
   for (i in 1:length(uniqentries)){
     namelist[[paste0("Input_",uniqentries[i])]] <- paste0("Input_",uniqentries[i])
   }
   uniqentries <- factortibble %>%
-    select(abTreatment,exposureCondition,exposureLevel) %>%
-    filter(abTreatment != "none") %>%
-    distinct() %>%
-    mutate(newcol=paste0(abTreatment,"_",exposureCondition,"_",exposureLevel)) %>%
-    select(newcol) %>%
-    as_vector %>%
+    tidyverse::select(abTreatment,exposureCondition,exposureLevel) %>%
+    tidyverse::filter(abTreatment != "none") %>%
+    tidyverse::distinct() %>%
+    tidyverse::mutate(newcol=paste0(abTreatment,"_",exposureCondition,"_",exposureLevel)) %>%
+    tidyverse::select(newcol) %>%
+    tidyverse::as_vector %>%
     as.character()
   #uniqentries <- uniqentries[!grepl("control",uniqentries)]
   for (i in 1:length(uniqentries)){
@@ -288,23 +288,23 @@ splitAndBuildDEobjs <- function(factortibble=factorTbl,filelist=fileList){
       parsedname <- str_split(n,"_",simplify=TRUE)
         if (parsedname[1]=="Input") {
           factortibbleSet[[n]] <- factortibble %>%
-            filter(abTreatment == "none",exposureLevel==parsedname[2])
+            tidyverse::filter(abTreatment == "none",exposureLevel==parsedname[2])
           #factortibbleSet[[n]] <- dropSingleLevelFactors(factortibbleSet[[n]])
           #factortibbleSet[[n]] <- dropSingleReps(factortibbleSet[[n]])
           factortibbleSet[[n]] <- factortibbleSet[[n]] %>%
-            group_by(replicate) %>%
-            filter(n()!=1) %>%
-            ungroup()
+            tidyverse::group_by(replicate) %>%
+            tidyverse::filter(n()!=1) %>%
+            tidyverse::ungroup()
         } else {
           factortibbleSet[[n]] <- factortibble %>%
-            filter(exposureCondition==parsedname[2],
+            tidyverse::filter(exposureCondition==parsedname[2],
                    exposureLevel==parsedname[3])
           #factortibbleSet[[n]] <- dropSingleLevelFactors(factortibbleSet[[n]])
           #factortibbleSet[[n]] <- dropSingleReps(factortibbleSet[[n]])
           factortibbleSet[[n]] <- factortibbleSet[[n]] %>%
-            group_by(replicate) %>%
-            filter(n()!=1) %>%
-            ungroup()
+            tidyverse::group_by(replicate) %>%
+            tidyverse::filter(n()!=1) %>%
+            tidyverse::ungroup()
               }
           }
 

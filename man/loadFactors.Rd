@@ -4,7 +4,9 @@
 \alias{loadFactors}
 \title{Load factors table for count table files}
 \usage{
-loadFactors(filepath = "./data/factors.tbl")
+loadFactors(
+  filepath = system.file(package = "modRIPseq", "extdata", "factorsAll.tbl")
+)
 }
 \arguments{
 \item{filepath}{Path to the file containing your table of factors. Defaults to example file "./data/factors.tbl"}
