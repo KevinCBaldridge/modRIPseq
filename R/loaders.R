@@ -282,7 +282,7 @@ splitAndBuildDEobjs <- function(factortibble=factorTbl,filelist=fileList){
     #This block works now - need to move the singlerepremoval to a later stage though
     nameList <- setDDSnamesDose(factortibble)
     for (n in names(nameList)){
-      parsedname <- str_split(n,"_",simplify=TRUE)
+      parsedname <- stringr::str_split(n,"_",simplify=TRUE)
         if (parsedname[1]=="Input") {
           factortibbleSet[[n]] <- factortibble %>%
             dplyr::filter(abTreatment == "none",exposureLevel==parsedname[2])
@@ -308,7 +308,7 @@ splitAndBuildDEobjs <- function(factortibble=factorTbl,filelist=fileList){
     # } else { #need to double check this block works right...
     # nameList <- setDDSnames(factortibble)
     # for (n in names(nameList)){
-    #     parsedname <- str_split(n,"_",simplify=TRUE)
+    #     parsedname <- stringr::str_split(n,"_",simplify=TRUE)
     #     if("IP"==parsedname[1]){
     #       filtervec <-parsedname[2]
     #       factortibbleSet[[n]] <- factortibble %>%
@@ -340,7 +340,7 @@ files<-c()
 ddslist <- c()
 txi.rsem <- c()
 for (n in names(factortibbleSet)){
-  if(str_detect(n,"In")){
+  if(stringr::str_detect(n,"In")){
     designs[[n]]<-~exposureCondition
   } else {
     designs[[n]]<-~replicate+abTreatment

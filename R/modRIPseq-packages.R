@@ -5,4 +5,5 @@
 #'@import forcats
 #'@import readr
 #'@import tximport
+#'@import stringr
 NULL
