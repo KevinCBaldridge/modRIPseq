@@ -4,7 +4,9 @@
 \alias{loadFileList}
 \title{Load a file containing list of count table files}
 \usage{
-loadFileList(filepath = "./data/inputfilelist.txt")
+loadFileList(
+  filepath = system.file("extdata", "inputfilelistAll.txt", package = "modRIPseq")
+)
 }
 \arguments{
 \item{filepath}{Path to the file containing list of filenames for RSEM output files. Defaults to "data/inputfilelist.txt"}
