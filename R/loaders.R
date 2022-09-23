@@ -221,7 +221,7 @@ setDDSnamesDose <- function(factortibble = factorTbl){
     dplyr::filter(abTreatment=="none") %>%
     dplyr::distinct() %>%
     dplyr::select(exposureLevel) %>%
-    purrr::as_vector %>%
+    purrr::as_vector() %>%
     as.character()
   for (i in 1:length(uniqentries)){
     namelist[[paste0("Input_",uniqentries[i])]] <- paste0("Input_",uniqentries[i])
@@ -232,7 +232,7 @@ setDDSnamesDose <- function(factortibble = factorTbl){
     dplyr::distinct() %>%
     dplyr::mutate(newcol=paste0(abTreatment,"_",exposureCondition,"_",exposureLevel)) %>%
     dplyr::select(newcol) %>%
-    purrr::as_vector %>%
+    purrr::as_vector() %>%
     as.character()
   #uniqentries <- uniqentries[!grepl("control",uniqentries)]
   for (i in 1:length(uniqentries)){
