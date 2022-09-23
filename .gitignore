@@ -1,0 +1,6 @@
+.Rproj.user
+.Rbuildignore
+modRIPseq.Rproj
+*.Rdata
+.Rhistory
+R/modRIPseq_pipeline.R
