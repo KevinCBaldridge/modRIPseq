@@ -17,9 +17,6 @@
 #write the script for running all these functions, vignette?
 #write all documentation Roxygen stuff
 
-
-
-
 #load treatment factors (Ab and Exposure) file into table
 #'@title Load factors table for count table files
 #'@description This function will load the factors table file for annotating samples, which will be used in other package functions to set up analysis of count data from gene expression
@@ -56,7 +53,7 @@ loadFactors <- function(filepath=system.file(package='modRIPseq',"extdata","fact
 #'loadFileList("./data/inputfilelist.txt")
 #'loadFileList("./myData/myFileList.txt")
 #'@seealso [[modRIPseq::loadFactors()]] which is the function that loads factor tables with first column corresponding to the fileList returned by this function
-loadFileList <- function(filepath='./data/inputfilelist.txt'){
+loadFileList <- function(filepath=system.file("extdata","inputfilelistAll.txt",package='modRIPseq')){
   dir <- dirname(filepath)
   fileList <- scan(file=filepath,sep="\n",what="")
   fileList <- basename(fileList)
