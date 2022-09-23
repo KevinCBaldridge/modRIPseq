@@ -227,7 +227,7 @@ setDDSnamesDose <- function(factortibble = factorTbl){
     namelist[[paste0("Input_",uniqentries[i])]] <- paste0("Input_",uniqentries[i])
   }
   uniqentries <- factortibble %>%
-    dpylr::select(abTreatment,exposureCondition,exposureLevel) %>%
+    dplyr::select(abTreatment,exposureCondition,exposureLevel) %>%
     dplyr::filter(abTreatment != "none") %>%
     dplyr::distinct() %>%
     dplyr::mutate(newcol=paste0(abTreatment,"_",exposureCondition,"_",exposureLevel)) %>%
