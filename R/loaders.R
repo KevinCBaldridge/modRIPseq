@@ -1,7 +1,6 @@
 # library(tidyverse)
 # library(tximport)
 # library(DESeq2)
-
 #essentially global variables I will need:
 #factor.tbl - path to file containing tab-separated table, with column names as first row, where the first column should be the filenames, second third and fourth columns are factors with appropriate first-row labels
 #inputfilelist.txt - path to file containing newline-separated list of files that are the output files from RSEM at the transcript level. These filenames should match the filenames in the factor.tbl first column. (will add error checking to confirm this)
@@ -92,11 +91,11 @@ loadRSEMs <- function(filelist=fileList,checkRowNaming=FALSE){
   if(!length(iso)==1){stop('inputfilelist.txt appears to have a mixture of isoform- and gene-level summaries, please ensure consistency')}
   if(length(iso)==1 && iso){
     print("automatically identified as isoform-level summary from rsem-calculate-expression")
-    txi.rsem <- invisible(tximport(files=filelist,type='rsem',txOut=TRUE))
+    txi.rsem <- invisible(tximport::tximport(files=filelist,type='rsem',txOut=TRUE))
   }
   if(length(gene)==1 && gene){
     print("automatically identified as gene-level summary from rsem-calculate-expression")
-    txi.rsem <- invisible(tximport(files=filelist,type='rsem',txOut=FALSE))
+    txi.rsem <- invisible(tximport::tximport(files=filelist,type='rsem',txOut=FALSE))
   }
   if(checkRowNaming==TRUE){
     print("Checking row naming...")
@@ -356,7 +355,7 @@ for (n in names(factortibbleSet)){
   factortibbleSet[[n]] <- reorderFactorsByFile(factortibbleSet[[n]],file,filelistlist[[n]])
   txi.rsem[[n]] <- loadRSEMs(files[[n]])
 
-  ddslist[[n]] <-   DESeqDataSetFromTximport(txi.rsem[[n]],
+  ddslist[[n]] <-   DESeq2::DESeqDataSetFromTximport(txi.rsem[[n]],
                                   colData = factortibbleSet[[n]],
                                   design=designs[[n]])
   }

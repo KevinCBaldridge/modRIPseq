@@ -27,7 +27,7 @@ runDEseqSet <- function(ddsobjlist=ddsObjList, ...){
   for (i in 1:length(ddsobjlist)){
     NAME <- names(ddsobjlist[i])
     if (! str_detect(NAME,"In")){
-    ddsDEobjList[[NAME]] <- DESeq(ddsobjlist[[NAME]],
+    ddsDEobjList[[NAME]] <- DESeq2::DESeq(ddsobjlist[[NAME]],
                                   test='LRT',
                                   full=~replicate+abTreatment,
                                   reduced=~replicate,
@@ -36,11 +36,11 @@ runDEseqSet <- function(ddsobjlist=ddsObjList, ...){
 
     }
     else {
-      ddsDEobjList[[NAME]] <- DESeq(ddsobjlist[[NAME]],
+      ddsDEobjList[[NAME]] <- DESeq2::DESeq(ddsobjlist[[NAME]],
                                     ...
                                     )
     }
-    ddrObjList[[NAME]] <- results(ddsDEobjList[[NAME]],...)
+    ddrObjList[[NAME]] <- DESeq2::results(ddsDEobjList[[NAME]],...)
   }
   return(ddrObjList)
 }
