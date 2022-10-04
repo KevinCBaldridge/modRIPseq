@@ -23,7 +23,7 @@ organized with each file path name on a newline, without any header row in the f
 the file paths in each newline should correspond to the first column in the factors table file passed as a parameter to the loadFactors function
 }
 \examples{
-loadFileList("./data/inputfilelist.txt")
+fileList <- loadFileList("./data/inputfilelist.txt")
 loadFileList("./myData/myFileList.txt")
 }
 \seealso{

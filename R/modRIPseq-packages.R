@@ -1,9 +1,9 @@
 #'@import DESeq2
 #'@importFrom magrittr %>%
 #'@import dplyr
-#'@import purrr
-#'@import forcats
-#'@import readr
-#'@import tximport
-#'@import stringr
+#'@importFrom purrr as_vector
+#'@importFrom forcats as_factor
+#'@importFrom readr read_table
+#'@importFrom tximport tximport
+#'@importFrom stringr str_detect str_replace_all str_replace str_split
 NULL

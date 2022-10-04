@@ -19,8 +19,7 @@ This function will dynamically set names for each DESeqDataSet based on factor t
 This function will dynamically set names for the DESeqDataSet objects according to the requirements of the input files.
 }
 \examples{
-setDDSnamesDose(factorTbl)
-setDDSnames
+nameList <- setDDSnamesDose(factorTbl)
 }
 \seealso{
 [\code{\link[=loadFactors]{loadFactors()}}] which is a prerequisite for this function

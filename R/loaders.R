@@ -30,7 +30,7 @@
 #'@export
 #'@return Tibble object containing the factors table corresponding to filenames
 #'@examples
-#'loadFactors('./data/factors.tbl')
+#'factorTbl <-loadFactors('./data/factors.tbl')
 #'loadFactors('mydata/myfactorsTable.txt')
 #'@seealso [modRIPseq::splitAndBuildDEobjs()] which follows this function in the modRIPseq pipeline
 loadFactors <- function(filepath=system.file(package='modRIPseq',"extdata","factorsAll.tbl")){
@@ -50,7 +50,7 @@ loadFactors <- function(filepath=system.file(package='modRIPseq',"extdata","fact
 #'@export
 #'@return Vector of filenames pointing to the files containing RSEM count data
 #'@examples
-#'loadFileList("./data/inputfilelist.txt")
+#'fileList <- loadFileList("./data/inputfilelist.txt")
 #'loadFileList("./myData/myFileList.txt")
 #'@seealso [[modRIPseq::loadFactors()]] which is the function that loads factor tables with first column corresponding to the fileList returned by this function
 loadFileList <- function(filepath=system.file("extdata","inputfilelistAll.txt",package='modRIPseq')){
@@ -75,7 +75,7 @@ loadFileList <- function(filepath=system.file("extdata","inputfilelistAll.txt",p
 #'@export
 #'@return List of matrices corresponding to count, abundance, and lengths for all the count tables indicated in your input file list (same as return from tximport)
 #'@examples
-#'loadRSEMs(fileLlist)
+#'txi.rsem <- loadRSEMs(fileLlist)
 #'loadRSEMs(myFileList,TRUE)
 #'@seealso [tximport::tximport()] which this function wraps
 #'@seealso [modRIPseq::loadFileList()] which is the precursor to this function in the modRIPseq pipeline
@@ -112,7 +112,7 @@ loadRSEMs <- function(filelist=fileList,checkRowNaming=FALSE){
 #'@export
 #'@return List of matrices corresponding to count, abundance, and lengths for all the count tables indicated in your input file list (same as return from tximport), with corrected row names if they did not pass the checks
 #'@examples
-#'checkRowNaming(txi.rsem,fileList)
+#'txobj <- checkRowNaming(txi.rsem,fileList)
 #'@seealso [modRIPseq::loadRSEMs()] which is the function that calls this validation function
 checkRowNaming <- function(txobj,filelist){
 #  print(filelist)
@@ -156,7 +156,7 @@ checkRowNaming <- function(txobj,filelist){
 #'@export
 #'@return The tibble of factors from loadFactors() that has been rearranged to match order of the file list vector from loadFileList()
 #'@examples
-#'reorderFactorsByFile(factorTbl,file,fileList)
+#'factorTbl <- reorderFactorsByFile(factorTbl,file,fileList)
 #'@seealso [modRIPseq::loadFileList()]
 #'@seealso [modRIPseq::loadFactors()]
 reorderFactorsByFile <- function(factortibble=factorTbl,filecol=file,filelist=fileList){
@@ -209,8 +209,7 @@ reorderFactorsByFile <- function(factortibble=factorTbl,filecol=file,filelist=fi
 #'@param factortibble The tibble of factors that will be used to set DESeqDataSet object names in
 #'@return The list of names which will be used for denoting individual formulaList and ddsObjList entries
 #'@examples
-#'setDDSnamesDose(factorTbl)
-#'setDDSnames
+#'nameList <- setDDSnamesDose(factorTbl)
 #'@seealso [[modRIPseq::loadFactors()]] which is a prerequisite for this function
 #'@seealso [[modRIPseq::splitAndBuildDEobjs()]] which calls this function
 setDDSnamesDose <- function(factortibble = factorTbl){
@@ -270,7 +269,7 @@ setDDSnamesDose <- function(factortibble = factorTbl){
 #'@export
 #'@return List of DESeqDataSet objects, named with "input","IPc","IPx"
 #'@examples
-#'splitAndBuildDEobjs(factorTbl,fileList)
+#'ddsObjList <- splitAndBuildDEobjs(factorTbl,fileList)
 #'splitAndBuildDEobjs(myFactorTbl,myFileList)
 #'@seealso [DESeq2::DESeqDataSetFromTximport()] which this function wraps
 #'@seealso [modRIPseq::loadFileList()] and [modRIPseq::loadFactors()] which are the functions earlier in the modRIPseq pipeline that prepare inputs for this function

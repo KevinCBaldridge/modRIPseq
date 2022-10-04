@@ -27,7 +27,7 @@ This function will ensure the correct order of factors in the tibble according t
 This function is only called generally from within the \code{\link[=splitAndBuildDEobjs]{splitAndBuildDEobjs()}} function
 }
 \examples{
-reorderFactorsByFile(factorTbl,file,fileList)
+factorTbl <- reorderFactorsByFile(factorTbl,file,fileList)
 }
 \seealso{
 \code{\link[=loadFileList]{loadFileList()}}

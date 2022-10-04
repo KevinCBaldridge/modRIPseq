@@ -23,7 +23,7 @@ Additionally, if the row names don't check out properly, this will rename them a
 This function generally should not be called directly, use the optional parameter checkRowNaming=TRUE into loadRSEMs() to call indirectly
 }
 \examples{
-checkRowNaming(txi.rsem,fileList)
+txobj <- checkRowNaming(txi.rsem,fileList)
 }
 \seealso{
 \code{\link[=loadRSEMs]{loadRSEMs()}} which is the function that calls this validation function

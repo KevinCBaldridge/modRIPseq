@@ -21,7 +21,7 @@ This function creates DESeq2 dataset objects for differential expression & oxida
 This function will use the other objects (factorTbl,fileList) created in the modRIPseq pipeline to create a set of DESeq dataset objects for subsequent analysis of exposure-induced differential expression and oxidation of transcripts.
 }
 \examples{
-splitAndBuildDEobjs(factorTbl,fileList)
+ddsObjList <- splitAndBuildDEobjs(factorTbl,fileList)
 splitAndBuildDEobjs(myFactorTbl,myFileList)
 }
 \seealso{

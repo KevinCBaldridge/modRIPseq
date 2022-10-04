@@ -26,7 +26,7 @@ third column should be the exposure condition (i.e. CAC/clean air/no vs OAM/expo
 fourth column should be the exposure level (i.e. high vs low), if you have multiple levels of exposure in your data
 }
 \examples{
-loadFactors('./data/factors.tbl')
+factorTbl <-loadFactors('./data/factors.tbl')
 loadFactors('mydata/myfactorsTable.txt')
 }
 \seealso{
