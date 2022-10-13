@@ -1,23 +1,6 @@
-# library(tidyverse)
-# library(tximport)
-# library(DESeq2)
-#essentially global variables I will need:
 #factor.tbl - path to file containing tab-separated table, with column names as first row, where the first column should be the filenames, second third and fourth columns are factors with appropriate first-row labels
 #inputfilelist.txt - path to file containing newline-separated list of files that are the output files from RSEM at the transcript level. These filenames should match the filenames in the factor.tbl first column. (will add error checking to confirm this)
-#done - note actually that the default filename output from rsem contains "isoform" or "gene", so we can have that be set from filenames automatically
-#note that the functions in this file, none should use the biocparallel stuff...
 
-#To do:
-#DONE - add fucntionality for transcrtipt vs whole gene level
-#add functionality for other count tables besides RSEM
-#rework it all to be in line with my requirements for factors.tbl
-#add processing of path so dont have to change wd partway through
-#finish setddsnames in line with new requirements
-#build initial formatting/error checking into all functions
-#write the script for running all these functions, vignette?
-#write all documentation Roxygen stuff
-
-#load treatment factors (Ab and Exposure) file into table
 #'@title Load factors table for count table files
 #'@description This function will load the factors table file for annotating samples, which will be used in other package functions to set up analysis of count data from gene expression
 #'@details The input file to this function should be a tab-separated table with:
@@ -74,14 +57,11 @@ loadFileList <- function(filepath=system.file("extdata","inputfilelistAll.txt",p
 #'@param checkRowNaming (OPTIONAL) Boolean flag to check all row names within files and across files to ensure row name consistency in counts, lengths, and abundances. Defaults to FALSE.
 #'@export
 #'@return List of matrices corresponding to count, abundance, and lengths for all the count tables indicated in your input file list (same as return from tximport)
-#'@examples
+    #'@examples
 #'txi.rsem <- loadRSEMs(fileLlist)
 #'loadRSEMs(myFileList,TRUE)
 #'@seealso [tximport::tximport()] which this function wraps
 #'@seealso [modRIPseq::loadFileList()] which is the precursor to this function in the modRIPseq pipeline
-#note that the invisible doesnt work right here when tximport is loaded
-#note also that as it stands currently, need to navigate to subdirectory
-#  - add a test if there's a subfolder in the parameter fed to inputfilelist.txt, check if it matches the filenames or not, and then navigate if necessary to that directory before loading
 loadRSEMs <- function(filelist=fileList,checkRowNaming=FALSE){
   iso <- unique(grepl('isoform',filelist))
   gene <- unique(grepl('gene',filelist))
@@ -115,14 +95,9 @@ loadRSEMs <- function(filelist=fileList,checkRowNaming=FALSE){
 #'txobj <- checkRowNaming(txi.rsem,fileList)
 #'@seealso [modRIPseq::loadRSEMs()] which is the function that calls this validation function
 checkRowNaming <- function(txobj,filelist){
-#  print(filelist)
-#  print(head(txobj))
 #should I have this loop over all files rather than just the first, checking for consistency among files as well as the various components of the txi object?
   conversiontable <- read.table(sep="\t",header=TRUE,file=filelist[1],stringsAsFactors=FALSE)
-#  print(head(conversiontable[,1]))
-#  print(head(txobj$counts))
   tmp <- unique(conversiontable[,1]==rownames(txobj$counts))
-#  print(tmp)
   if(length(tmp)==1){
     if(tmp!=TRUE) {
       warning("Rownames for txi.rsem$counts are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
@@ -164,44 +139,6 @@ reorderFactorsByFile <- function(factortibble=factorTbl,filecol=file,filelist=fi
   return(factortibble)
 }
 
-#
-# #'@title Set names for DESeq object list
-# #'@description This function will dynamically set names for each DESeqDataSet based on factor tibble
-# #'@details This function will dynamically set names for the DESeqDataSet objects within reason, but it requires some loose structure around column naming in factor tibble
-# #'  Specifically:
-# #'    One column must be named something in the following list (case insensitive) corresponding to the replicate/trial number:
-# #'      replicate
-# #'      experiment (entries in column must be integers for this nomenclature to prevent confusion with exposure condition possibilities)
-# #'      trial
-# #'      sample
-# #'    One column must be named something in the following list (case insensitive) corresponding to the antibody treatment/pulldown/IP condition:
-# #'      AntibodyTreatment
-# #'      pulldown
-# #'      immunoprecipitation
-# #'      IP
-# #'      Ab
-# #'      Antibody
-# #'
-# #'@param factortibble The tibble of factors that will be used to set DESeqDataSet object names in
-# #'@return The list of names which will be used for denoting individual formulaList and ddsObjList entries
-# #'@examples
-# #'@seealso
-# setDDSnames <- function(factortibble = factorTbl){
-#   namelist <- c()
-#   namelist[["Input"]] <- "Input"
-#   namelist[["IP_control"]] <- "IP_control"
-#   uniqentries <- factortibble %>%
-#     select(exposureCondition) %>%
-#     unique() %>%
-#     as_vector() %>%
-#     as.character()
-#   uniqentries <- uniqentries[! uniqentries %in% c("control")]
-#   for (i in 1:length(uniqentries)){
-#     namelist[[paste0("IP_",uniqentries[i])]] <- paste0("IP_",uniqentries[i])
-#     }
-#   return(namelist)
-# }
-
 
 #'@title Set names for DESeq object list
 #'@description This function will dynamically set names for each DESeqDataSet based on factor tibble
@@ -241,25 +178,6 @@ setDDSnamesDose <- function(factortibble = factorTbl){
 }
 
 
-
-#need to specify that factorTbl must have something indicating replicate number...
-# dropSingleReps <- function(factortibble = factorTbl){
-#   ncolsval <- 2^(ncol(factortibble)-2)
-#   factortibble <- factortibble %>%
-#     group_by(replicate) %>%
-#     filter(!n()<ncolsval) %>%
-#     ungroup()
-#   return(factortibble)
-# }
-#
-# dropSingleLevelFactors <- function(factortibble = factorTbl){
-#   factortibble <- factortibble %>% select(!where(~length(unique(.))==1))
-#   return(factortibble)
-# }
-
-
-
-#need to add a test and warning for if a factor only has one member of a level, and drop it, i.e. the R5 sample
 
 #'@title Build DESeq2 objects for subsequent differential expression  & oxidation analysis
 #'@description This function creates DESeq2 dataset objects for differential expression & oxidation analysis from the various file loading functions in the modRIPseq pipeline.

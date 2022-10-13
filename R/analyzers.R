@@ -1,9 +1,3 @@
-
-#thisfunction, you can optionally pass the BPPARAM option with your parameter set, or parallel=TRUE if you registered the params, if you desire to use parallel processing
-#is it worth writing a dedicated function for looping over dds/ddr obj list named object entries? then that could be called,
-#make sure to add error-check for length of named list parameters?
-#i should also add examples of non-default DESeq2 options as ... parameters
-
 #'@title Run DESeq2 analysis in the modRIPseq pipeline
 #'@description This function will run the DESeq analysis of the DESeqDataSet objects prepared in the modRIPseq pipeline to provide the resulting analyzed data.
 #'@details This function provides a wrapper to the DESeq() function that analyzes DESeqDataSet objects.
@@ -12,12 +6,13 @@
 #'@export
 #'@param ddsobjlist The named list of DESeq DataSet objects that have been created already by one of the DESeqDataSetFrom*** functions. Defaults to ddsObjList
 #'@param formulalist The named list of vectors containing full and reduced formulas. The length of this vector should be . Defaults to formulaList
-#'@param ... optionally, can pass named keyword parameters such as BPPARAM or parallel=TRUE for using biocparallel. for parallel=TRUE, you need to have registered the params already in your environment
+#'@param ... optionally, can pass named keyword parameters such as DESeq2 options passed to [DESeq2::DESeq()] or options like BPPARAM or parallel=TRUE for using biocparallel. for parallel=TRUE, you need to have registered the params already in your environment
 #'@return named list of DESeq results objects that contain the DESeq2 analyzed DESeqDataSet objects
 #'@examples
 #'runDEseqSet(ddsObjList,formulaList)
 #'runDEseqSet(ddsObjList,formulaList,parallel=TRUE)
 #'runDEseqSet(myDDSobjList,myFormulaList)
+#'runDEseqSet(ddsObjList,formulaList,test="Wald",fitType='local')
 #'@seealso [modRIPseq::splitAndBuildDEobjs()] which is the step before this function in the 8OGseq pipeline
 #'@seealso [DESeq2::DESeq()] which this function wraps
 #'@seealso [BiocParallel] which can be used to employ parallel processing with DESeq2, and therefore with this package

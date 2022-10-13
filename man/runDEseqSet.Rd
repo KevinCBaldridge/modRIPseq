@@ -9,7 +9,7 @@ runDEseqSet(ddsobjlist = ddsObjList, ...)
 \arguments{
 \item{ddsobjlist}{The named list of DESeq DataSet objects that have been created already by one of the DESeqDataSetFrom*** functions. Defaults to ddsObjList}
 
-\item{...}{optionally, can pass named keyword parameters such as BPPARAM or parallel=TRUE for using biocparallel. for parallel=TRUE, you need to have registered the params already in your environment}
+\item{...}{optionally, can pass named keyword parameters such as DESeq2 options passed to \code{\link[DESeq2:DESeq]{DESeq2::DESeq()}} or options like BPPARAM or parallel=TRUE for using biocparallel. for parallel=TRUE, you need to have registered the params already in your environment}
 
 \item{formulalist}{The named list of vectors containing full and reduced formulas. The length of this vector should be . Defaults to formulaList}
 }
@@ -28,6 +28,7 @@ The formula list parameter requires a specific structure, wherein for each name,
 runDEseqSet(ddsObjList,formulaList)
 runDEseqSet(ddsObjList,formulaList,parallel=TRUE)
 runDEseqSet(myDDSobjList,myFormulaList)
+runDEseqSet(ddsObjList,formulaList,test="Wald",fitType='local')
 }
 \seealso{
 \code{\link[=splitAndBuildDEobjs]{splitAndBuildDEobjs()}} which is the step before this function in the 8OGseq pipeline

@@ -6,4 +6,5 @@
 #'@importFrom readr read_table
 #'@importFrom tximport tximport
 #'@importFrom stringr str_detect str_replace_all str_replace str_split
+#'@import ggplot2
 NULL
