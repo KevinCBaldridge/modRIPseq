@@ -95,7 +95,6 @@ loadRSEMs <- function(filelist=fileList,checkRowNaming=FALSE){
 #'txobj <- checkRowNaming(txi.rsem,fileList)
 #'@seealso [modRIPseq::loadRSEMs()] which is the function that calls this validation function
 checkRowNaming <- function(txobj,filelist){
-#should I have this loop over all files rather than just the first, checking for consistency among files as well as the various components of the txi object?
   conversiontable <- read.table(sep="\t",header=TRUE,file=filelist[1],stringsAsFactors=FALSE)
   tmp <- unique(conversiontable[,1]==rownames(txobj$counts))
   if(length(tmp)==1){
@@ -151,8 +150,6 @@ reorderFactorsByFile <- function(factortibble=factorTbl,filecol=file,filelist=fi
 #'@seealso [[modRIPseq::splitAndBuildDEobjs()]] which calls this function
 setDDSnamesDose <- function(factortibble = factorTbl){
   namelist <- c()
-  #namelist[["Input"]] <- "Input"
-  #namelist[["IP_control"]] <- "IP_control"
   uniqentries <- factortibble %>%
     dplyr::filter(abTreatment=="none") %>%
     dplyr::distinct() %>%
@@ -170,7 +167,6 @@ setDDSnamesDose <- function(factortibble = factorTbl){
     dplyr::select(newcol) %>%
     purrr::as_vector() %>%
     as.character()
-  #uniqentries <- uniqentries[!grepl("control",uniqentries)]
   for (i in 1:length(uniqentries)){
     namelist[[paste0(uniqentries[i])]] <- paste0(uniqentries[i])
   }
@@ -192,19 +188,13 @@ setDDSnamesDose <- function(factortibble = factorTbl){
 #'@seealso [DESeq2::DESeqDataSetFromTximport()] which this function wraps
 #'@seealso [modRIPseq::loadFileList()] and [modRIPseq::loadFactors()] which are the functions earlier in the modRIPseq pipeline that prepare inputs for this function
 splitAndBuildDEobjs <- function(factortibble=factorTbl,filelist=fileList){
-  #this function will assume the factor.tbl column naming, see requirements
-  #need to move these singlelevel factors and single reps to later stage of processing...
   factortibbleSet <- c()
-#  if("exposureLevel" %in% colnames(factortibble)){
-    #This block works now - need to move the singlerepremoval to a later stage though
     nameList <- setDDSnamesDose(factortibble)
     for (n in names(nameList)){
       parsedname <- stringr::str_split(n,"_",simplify=TRUE)
         if (parsedname[1]=="Input") {
           factortibbleSet[[n]] <- factortibble %>%
             dplyr::filter(abTreatment == "none",exposureLevel==parsedname[2])
-          #factortibbleSet[[n]] <- dropSingleLevelFactors(factortibbleSet[[n]])
-          #factortibbleSet[[n]] <- dropSingleReps(factortibbleSet[[n]])
           factortibbleSet[[n]] <- factortibbleSet[[n]] %>%
             dplyr::group_by(replicate) %>%
             dplyr::filter(n()!=1) %>%
@@ -213,44 +203,12 @@ splitAndBuildDEobjs <- function(factortibble=factorTbl,filelist=fileList){
           factortibbleSet[[n]] <- factortibble %>%
             dplyr::filter(exposureCondition==parsedname[2],
                    exposureLevel==parsedname[3])
-          #factortibbleSet[[n]] <- dropSingleLevelFactors(factortibbleSet[[n]])
-          #factortibbleSet[[n]] <- dropSingleReps(factortibbleSet[[n]])
           factortibbleSet[[n]] <- factortibbleSet[[n]] %>%
             dplyr::group_by(replicate) %>%
             dplyr::filter(n()!=1) %>%
             dplyr::ungroup()
               }
           }
-
-    # } else { #need to double check this block works right...
-    # nameList <- setDDSnames(factortibble)
-    # for (n in names(nameList)){
-    #     parsedname <- stringr::str_split(n,"_",simplify=TRUE)
-    #     if("IP"==parsedname[1]){
-    #       filtervec <-parsedname[2]
-    #       factortibbleSet[[n]] <- factortibble %>%
-    #         filter(exposureCondition %in% filtervec)
-    #       #factortibbleSet[[n]] <- dropSingleLevelFactors(factortibbleSet[[n]])
-    #       #factortibbleSet[[n]] <- dropSingleReps(factortibbleSet[[n]])
-    #       #print(factortibbleSet[[n]])
-    #       factortibbleSet[[n]] <- factortibbleSet[[n]] %>%
-    #         group_by(replicate) %>%
-    #         filter(n()!=1) %>%
-    #         ungroup()
-    #     } else if ("Input" == parsedname[1]){
-    #       factortibbleSet[[n]] <- factortibble %>%
-    #         filter(abTreatment == "none")
-    #       #factortibbleSet[[n]] <- dropSingleLevelFactors(factortibbleSet[[n]])
-    #       #factortibbleSet[[n]] <- dropSingleReps(factortibbleSet[[n]])
-    #       factortibbleSet[[n]] <- factortibbleSet[[n]] %>%
-    #         group_by(replicate) %>%
-    #         filter(n()!=1) %>%
-    #         ungroup()
-    #     } else {simpleError("Not matching correctly for naming stuff")}
-    #   }
-    # }
-#can I set these dynamically based on column names? might be too much...
-#well below doesnt work right yet, need to step through it...
 designs <- c()
 filelistlist <- c()
 files<-c()
@@ -263,9 +221,6 @@ for (n in names(factortibbleSet)){
     designs[[n]]<-~replicate+abTreatment
     }
   files[[n]] <-filelist[filelist %in% factortibbleSet[[n]]$file]
-  #print(files[[n]])
-  #filelistlist[[n]] <-eval(sym(paste0("files",n)))
-  #print(filelistlist[[n]])
   factortibbleSet[[n]] <- reorderFactorsByFile(factortibbleSet[[n]],file,filelistlist[[n]])
   txi.rsem[[n]] <- loadRSEMs(files[[n]])
 
@@ -280,9 +235,3 @@ for (n in names(factortibbleSet)){
 
 
 
-
-#note to self, I think I'd like to make this figure things out on its own the ordering, rather than feeding numbered rows into the DEseqdataset constructors, so to that end I'll have the factors.tbl first column be the filename, then the remainder be the factors themselves.
-#will probably need rigid column naming for the factors though...
-
-
-#note to self, can't find factors.tbl that is read in my real dissertation work. i have output logs, result files, etc, but can't find the script and inputs for some reason...

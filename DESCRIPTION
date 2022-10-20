@@ -1,6 +1,6 @@
 Package: modRIPseq
 Title: Run analysis of gene expression count tables for 8OGseq
-Version: 0.0.1.9000
+Version: 0.0.1.9001
 Authors@R: 
     person("Kevin", "Baldridge", , "baldridge.kevin@utexas.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-1829-7714"))
@@ -19,4 +19,5 @@ Imports:
         purrr (>= 0.3.4) ,
         ggplot2 (>= 3.3.6) ,
         biomaRt (>= 2.52.0) ,
-        enrichR (>= 3.1)
+        enrichR (>= 3.1) ,
+        VennDiagram (>= 1.7.3)

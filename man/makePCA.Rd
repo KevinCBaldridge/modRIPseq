@@ -20,31 +20,6 @@ function to examine data spread of modRIPseq data
 Note that for looping over ddsTfmList object, to display the plot you'll need to wrap this in a call to \code{\link[base:plot]{base::plot()}} as in the third example
 }
 \details{
-#write to have option for high (suppl fig 10c) or low (suppl fig 9b) plot
-#'@title Make volcano plot for modRIPseq results
-#'@description This function will create a volcano plot for the DESeq results for modRIPseq data
-#'@details
-#'@param
-#'@export
-#'@return
-#'@examples
-#'@seealso
-
-#not in paper? but part of data QC in pre-paper workup
-#'@title Make independent filtering plot
-#'@description
-#'@details
-#'@param
-#'@export
-#'@return
-#'@examples
-#'@seealso
-
-#suppl figure 4a - can we get
-#'@title Make Venn diagram plot of up/down regulated/oxidized transcripts
-#'@description
-#'@details
-
 #suppl figure 8
 #'@title Make log2FC 8OG enrichment plot with cutoff
 #'

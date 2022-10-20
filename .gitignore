@@ -4,3 +4,6 @@ modRIPseq.Rproj
 *.Rdata
 .Rhistory
 R/modRIPseq_pipeline.R
+*.tiff
+*.log
+

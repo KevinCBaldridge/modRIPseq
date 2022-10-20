@@ -1,0 +1,512 @@
+ddrtmp$contrast
+ddrtmp$contrast[1]
+plotPCA(ddrtmp,intgroup=ddrtmp$contrast[1])
+ddrIn[]
+ddrIn
+library(tidyverse)
+ddrIn@elementMetadata$description[2] %>% str_remove(.,"*: ")
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ")
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ",n=1)
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ")
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ")[1]
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ",n=4)
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ")
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ")[[1]]
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ")[1]
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ")[1,1]
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ")[,1]
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ")[['1']]
+tmp <- ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_split(.," ")
+tmp
+tmp[1]
+tmp[1][1]
+tmp[1][2]
+tmp[1][1][1]
+typeof(tmp)
+tmp[[1]]
+tmp[[1]][1]
+tmp <- ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_remove(.," .*")
+ddrIn@elementMetadata$description[2] %>% str_remove(.,".*: ") %>% str_remove(.," .*")
+ddrObjList[['Input_High']]$contrast
+unique(ddrtmp$contrast)
+makePCA <- function(ddstfm=ddsTfm,intgroup=NULL){
+if (is.null(intgroup)){
+igroup <- unique(ddstfm$contrast)
+}
+else {
+igroup <- intgroup
+}
+p <- DESeq2::plotPCA(ddstfm,intgroup=igroup)
+p + ggtitle(paste0("comparison: ",igroup))+
+theme(plot.title = element_text(hjust = 0.5))
+plot(p)
+return(p)
+}
+makePCA(ddrtmp)
+p <- makePCA(ddrtmp)
+ddrtmp$contrast
+igroup
+makePCA <- function(ddstfm=ddsTfm,intgroup=NULL){
+if (is.null(intgroup)){
+igroup <- unique(ddstfm$contrast)
+}
+else {
+igroup <- intgroup
+}
+p <- DESeq2::plotPCA(ddstfm,intgroup=igroup)
+p <- p + ggtitle(paste0("comparison: ",igroup))+
+theme(plot.title = element_text(hjust = 0.5))
+plot(p)
+return(p)
+}
+p <- makePCA(ddrtmp)
+ddrtmp
+ddrtmp$contrast <- NULL
+p <- makePCA(ddrtmp,intgroup = "exposureCondition")
+#'@title rlog transformation of expression data
+#'
+#'@title transform expression data
+#'@description wrapper function for transformations implemented by DESeq2 on count data for downstream analyses like PCA
+#'@details wrapper function for transformations implemented by DESeq2,
+#'  either [DESeq2::rlog()] or [DESeq2::varianceStabilizingTransformation()],
+#'  with options defaulting to those of 8OGseq paper usage (namely, blind=FALSE)
+#'  Note that you should loop over your ddsObjList as shown in the third example.
+#'@param data DESeqDataSet object to transform, Default is dds
+#'@param tfm the transformation to perform, must be one of 'rlog' (for [DESeq2::rlog()]) or 'varStbl' (for [DESeq2::varianceStabilizingTransformation()]). Default is 'rlog'
+#'@return the transformed DESeqDataSet object as class DESeqTransform
+#'@export
+#'@param ... any option that can be passed to [DESeq2::rlog()] or [DESeq2::varianceStabilizingTransformation()]
+#'@examples
+#'dds.tfm <- ddsTfm(dds,'rlog',blind=FALSE)
+#'dds.tfm <- ddsTfm(myDds,'varStbl')
+#'ddsTfmList=c();for (NAME in names(ddsObjList)){ddsTfmList[[NAME]]<-ddsTfm(ddsObjList[[NAME]])}
+#'@seealso [modRIPseq::splitAndBuildDEobjs()] which should be run before this to build the DESeqDataSet
+#'@seealso [DESeq2::rlog()] which this function wraps
+#'@seealso [DESeq2::varianceStabilizingTransformation()] which this function wraps
+#'
+ddsTfm <- function(data=dds,tfm='rlog',blind=FALSE,...){
+if (tfm == 'rlog'){dds.tfm <- DESeq::rlog(data,blind=FALSE,...)}
+else if (tfm == 'varStbl'){dds.tfm <- DESeq::varianceStabilizingTransformation(data,blind=FALSE,...)}
+else error('second parameter, tfm, must be set to either "rlog" or "varStbl"')
+return(dds.tfm)
+}
+#'@title add contrast information to ddsTfmList
+#'@description This function operates on a list of DESeqTransform object to add contrast information for intgroup option of [DESeq2::plotPCA()]
+#'@details This function will use the passed ddrObjList parameter to identify
+#'  the contrast used for the corresponding entry
+#'  in the passed ddsTfmList parameter. This contrast which will be set as an
+#'  additional list entry in the DESeqTransform object, and this matches the
+#'  column name of the variable used in the design of the DESeq analysis.
+#'  The primary purpose here is to generate a linked value for
+#'  the intgroup option of PCA plot
+#'@param ddstfmlist the ddsTfmList on which you'd like to set the contrast values
+#'@param ddrobjlist the ddrObjList to use for finding contrast to assign to the ddstfmlist. Defaults to ddrObjList
+#'@export
+#'@return the ddsTfmList object with each list entry containing the DESeqTransform object with an added column for contrast
+#'@examples
+#' ddsTfmList <- setTfmContrast(ddsTfmList,ddrObjList)
+#' myDdsTfmlist <- setTfmContrast(myDdsTfmlist,myDdrObjList)
+#'@seealso [modRIPseq::ddsTfm()] which should be used to build the list of DESeqTransform objects this function operates on
+#'@seealso [modRIPseq::runDEseqSet()] which should be used to build the list of DESeqResults objects this function uses to get contrast data
+setTfmContrast <- function(ddstfmlist=ddsTfmList,ddrobjlist=ddrObjList){
+for (NAME in names(ddstfmlist)){
+ddr <- ddrobjlist[[NAME]]
+contraster <-ddr@elementMetadata$description[2] %>%
+stringr::str_remove(.,".*: ") %>%
+str_remove(.," .*")
+ddstfmlist[[NAME]]$contrast <- contraster
+}
+return(ddstfmlist)
+}
+ddstmp <- ddsTfm(ddsObjList[["Input_High"]],'rlog')
+ddsTfm <- function(data=dds,tfm='rlog',blind=FALSE,...){
+if (tfm == 'rlog'){dds.tfm <- DESeq2::rlog(data,blind=FALSE,...)}
+else if (tfm == 'varStbl'){dds.tfm <- DESeq2::varianceStabilizingTransformation(data,blind=FALSE,...)}
+else error('second parameter, tfm, must be set to either "rlog" or "varStbl"')
+return(dds.tfm)
+}
+ddstmp <- ddsTfm(ddsObjList[["Input_High"]],'rlog')
+ddsTfmList=c();for (NAME in names(ddsObjList)){ddsTfmList[[NAME]]<-ddsTfm(ddsObjList[[NAME]])}
+DESeq2::plotPCA(ddsTfmList[["Input_High"]],intgroup="exposureCondition")
+ddsTfmContList <- setTfmContrast()
+DESeq2::plotPCA(ddsTfmContList[["Input_High"]])
+intgroup
+makePCA <- function(ddstfm=ddsTfm,intgroup=NULL){
+if (is.null(intgroup)){
+igroup <- unique(ddstfm$contrast)
+}
+else {
+igroup <- intgroup
+print("setting intgroup from ddsTfm$contrast")
+}
+p <- DESeq2::plotPCA(ddstfm,intgroup=igroup)
+p <- p + ggtitle(paste0("comparison: ",igroup))+
+theme(plot.title = element_text(hjust = 0.5))
+plot(p)
+return(p)
+}
+DESeq2::plotPCA(ddsTfmContList[["Input_High"]])
+makePCA <- function(ddstfm=ddsTfm,intgroup=NULL){
+if (is.null(intgroup)){
+igroup <- unique(ddstfm$contrast)
+print(igroup)
+}
+else {
+igroup <- intgroup
+print("setting intgroup from ddsTfm$contrast")
+}
+p <- DESeq2::plotPCA(ddstfm,intgroup=igroup)
+p <- p + ggtitle(paste0("comparison: ",igroup))+
+theme(plot.title = element_text(hjust = 0.5))
+plot(p)
+return(p)
+}
+DESeq2::plotPCA(ddsTfmContList[["Input_High"]])
+makePCA <- function(ddstfm=ddsTfm,contrast=NULL){
+if (is.null(contrast)){
+igroup <- unique(ddstfm$contrast)
+print(igroup)
+}
+else {
+igroup <- contrast
+print("setting intgroup from ddsTfm$contrast")
+}
+p <- DESeq2::plotPCA(ddstfm,intgroup=igroup)
+p <- p + ggtitle(paste0("comparison: ",igroup))+
+theme(plot.title = element_text(hjust = 0.5))
+plot(p)
+return(p)
+}
+DESeq2::plotPCA(ddsTfmContList[["Input_High"]])
+makePCA <- function(ddstfm=ddsTfm,intgroup=NULL){
+if (is.null(intgroup)){
+igroup <- unique(ddstfm$contrast)
+}
+else {
+igroup <- intgroup
+print("setting intgroup from ddsTfm$contrast")
+}
+p <- DESeq2::plotPCA(ddstfm,intgroup=igroup)
+p <- p + ggtitle(paste0("comparison: ",igroup))+
+theme(plot.title = element_text(hjust = 0.5))
+plot(p)
+return(p)
+}
+DESeq2::plotPCA(ddsTfmList[["Input_High"]],intgroup="exposureCondition")
+DESeq2::plotPCA(ddsTfmList[["Input_High"]],intgroup=unique(ddsTfmContList[["Input_High"]]$contrast))
+DESeq2::plotPCA(ddsTfmContList[["Input_High"]],intgroup=unique(ddsTfmContList[["Input_High"]]$contrast))
+DESeq2::plotPCA(ddsTfmList[["Input_High"]],intgroup="exposureCondition")
+DESeq2::plotPCA(ddsTfmContList[["Input_High"]],intgroup=unique(ddsTfmContList[["Input_High"]]$contrast))
+makePCA(ddsTfmContList[["Input_High"]])
+makePCA <- function(ddstfm=ddsTfm,intgroup=NULL){
+if (is.null(intgroup)){
+igroup <- unique(ddstfm$contrast)
+}
+else {
+igroup <- intgroup
+print("setting intgroup from ddsTfm$contrast")
+}
+p <- DESeq2::plotPCA(ddstfm,intgroup=igroup)
+p <- p + ggtitle(paste0("comparison: ",igroup))+
+theme(plot.title = element_text(hjust = 0.5))
+#  plot(p)
+return(p)
+}
+makePCA(ddsTfmContList[["Input_High"]])
+DESeq2::plotPCA(ddsTfmList[["Input_High"]],intgroup="exposureCondition")
+DESeq2::plotPCA(ddsTfmContList[["Input_High"]],intgroup=unique(ddsTfmContList[["Input_High"]]$contrast))
+makePCA(ddsTfmContList[["Input_High"]])
+DESeq2::plotSparsity(ddsObjList[["8OG_OAM_High"]])
+rlogoamhigh <- DESeq2::rlog(ddsObjList[["8OG_OAM_High"]])
+for (NAME in names(ddsObjList)){ddsTfmList[[NAME]]<-ddsTfm(ddsObjList[[NAME]]); print(NAME)}
+plotSparsity(ddsObjList[["8OG_OAM_Low"]])
+plotSparsity(ddsObjList[["8OG_OAM_Low"]],normalized = FALSE)
+plotSparsity(ddsObjList[["8OG_OAM_High"]],normalized = FALSE)
+plotSparsity(ddsObjList[["Input_High"]],normalized = FALSE)
+for (NAME in names(ddsTfmList)){makePCA(ddsTfmList[[NAME]])}
+for (NAME in names(ddsTfmContList)){makePCA(ddsTfmContList[[NAME]])}
+for (NAME in names(ddsTfmContList)){plot(makePCA(ddsTfmContList[[NAME]]))}
+makePCA <- function(ddstfm=ddsTfm,intgroup=NULL){
+if (is.null(intgroup)){
+igroup <- unique(ddstfm$contrast)
+}
+else {
+igroup <- intgroup
+print("setting intgroup from ddsTfm$contrast")
+}
+p <- DESeq2::plotPCA(ddstfm,intgroup=igroup)
+p <- p + ggtitle(NAME,subtitle =paste0("comparison: ",igroup) )
+return(p)
+}
+for (NAME in names(ddsTfmContList)){plot(makePCA(ddsTfmContList[[NAME]]))}
+library(biomaRt)
+devtools::session_info()
+library(enrichR)
+devtools::session_info()
+biomaRt::listEnsembl()
+install.packages(c("cli", "commonmark", "data.table", "devtools", "digest", "openssl", "purrr", "RCurl", "readr", "rlang", "RSQLite", "sys", "vctrs", "xfun", "XML", "yaml"))
+install.packages(c("cli", "commonmark", "data.table", "digest", "openssl", "sys", "xfun", "yaml"))
+base::Sys.getenv()
+library(devtools)
+document()
+warnings()
+library(devtools)
+document()
+?biomaRt::select
+?select
+library
+library(biomaRt)
+library(tidyverse)
+load(".Rdata")
+listEnsembl()
+?useEnsembl()
+listEnsemblGenomes()
+listEnsembl()
+listMarts(genes)
+listMarts('genes')
+listMarts()
+useMart('ENSEMBL_MART_ENSEMBL')
+listMarts()
+mart <- useMart('ENSEMBL_MART_ENSEMBL')
+head(rownames(ddrObjList[["Input_High"]]))
+biomaRt::attributePages(mart = mart)
+listDatasets(mart = )
+listDatasets(mart = mart)
+mart <- useMart('ENSEMBL_MART_ENSEMBL','hsapiens_gene_mart')
+mart <- useMart('ENSEMBL_MART_ENSEMBL','hsapiens_gene_ensembl')
+biomaRt::listAttributes(mart)
+attribdf <-biomaRt::listAttributes(mart)
+attribdf %>% filter(contains('hgnc'))
+attribdf %>% colnames()
+attribdf %>% filter(grepl('hgnc')
+attribdf %>% filter(grepl('hgnc'))
+attribdf %>% filter(grepl('hgnc',name))
+attribdf %>% filter(grepl('hgnc|transcript',name))
+attribdf %>% filter(grepl('hgnc|transcript stable',name))
+attribdf %>% filter(grepl('hgnc|transcript stable',name,ignore.case = TRUE))
+attribdf %>% filter(grepl('hgnc|transcript .* ID',name,ignore.case = TRUE))
+attribdf %>% filter(grepl("hgnc|transcript .* ID",name,ignore.case = TRUE))
+attribdf$name %>% filter(grepl("transcript .* ID .*"))
+attribdf$name %>% filter(grepl("transcript .* ID .*",name))
+attribdf%>% filter(grepl("transcript .* ID .*",name))
+attribdf%>% filter(grepl("transcript .* ID.*",name))
+attribdf%>% filter(grepl("transcript",name))
+attribdf%>% filter(grepl("transcript stable ID",name))
+attribdf%>% filter(grepl("transcript_id",name))
+attribdf%>% filter(grepl("ensembl_transcript_id",name))
+attribdf%>% filter(name=="ensembl_transcript_id")
+attrvec = c('HGNC symbol','ensembl_transcript_id')
+attrvec
+getBM(attrvec,filters = 'ensembl_transcript_id',values=head(rownames(ddrObjList[["Input_High"]])))
+getBM(attrvec,filters = 'ensembl_transcript_id',values=head(rownames(ddrObjList[["Input_High"]])),mart=mart)
+listAttributes(mart)
+getBM("ensembl_transcript_id",filters = 'ensembl_transcript_id',values=head(rownames(ddrObjList[["Input_High"]])),mart=mart)
+getBM("ensembl_transcript_id",filters = 'ensembl_transcript_id',values=str_remove(head(rownames(ddrObjList[["Input_High"]])),pattern = "\\..*"),mart=mart)
+getBM(c("ensembl_transcript_id",'hgnc_symbol'),filters = 'ensembl_transcript_id',values=str_remove(head(rownames(ddrObjList[["Input_High"]])),pattern = "\\..*"),mart=mart)
+getBM(c("ensembl_transcript_id","ensembl_transcript_id_version",'hgnc_symbol'),filters = 'ensembl_transcript_id',values=str_remove(head(rownames(ddrObjList[["Input_High"]])),pattern = "\\..*"),mart=mart)
+getBM(c("ensembl_transcript_id","ensembl_transcript_id_version",'hgnc_symbol'),filters = 'ensembl_transcript_id',values=str_remove(head(rownames(ddrObjList[["Input_High"]])),pattern = "\\..*"),mart=mart,bmHeader = TRUE,uniqueRows = TRUE)
+getBM(c("ensembl_transcript_id","ensembl_transcript_id_version",'hgnc_symbol'),filters = 'ensembl_transcript_id',values=str_remove(head(rownames(ddrObjList[["Input_High"]])),pattern = "\\..*"),mart=mart,uniqueRows = TRUE)
+annotDF <- getBM(c("ensembl_transcript_id","ensembl_transcript_id_version",'hgnc_symbol'),filters = 'ensembl_transcript_id',values=str_remove(head(rownames(ddrObjList[["Input_High"]])),pattern = "\\..*"),mart=mart)
+ddrIn@listData
+rownames(ddrIn@listData) %>% head()
+(ddrIn@elementMetadata) %>% head()
+(ddrIn@metadata) %>% head()
+(ddrIn@rownames) %>% head()
+rownames(ddr)
+rownames(ddrIn)
+names(ddrIn@listData) %>% head()
+ddrIn@listData %>% head()
+annotDF
+ddrIn@listData %>% head()
+head(ddrIn@listData)
+head(ddrIn)
+View(ddrIn)
+unique(head(ddrIn@rownames))
+unique(head(ddrIn@rownames)==annotDF)
+unique(head(ddrIn@rownames)==annotDF$ensembl_transcript_id_version)
+unique(str_remove(string=head(ddrIn@rownames),pattern="\\..*")==annotDF$ensembl_transcript_id)
+str_remove(string=head(ddrIn@rownames),pattern="\\..*")
+(str_remove(string=head(ddrIn@rownames),pattern="\\..*")==annotDF$ensembl_transcript_id)
+annotDF$ensembl_transcript_id
+is.vector((str_remove(string=head(ddrIn@rownames),pattern="\\..*"))
+is.vector((str_remove(string=head(ddrIn@rownames),pattern="\\..*")))
+annotDF[(str_remove(string=head(ddrIn@rownames),pattern="\\..*")),]
+annotDF[annotDF$ensembl_transcript_id==(str_remove(string=head(ddrIn@rownames),pattern="\\..*")),]
+annotDF[match(str_remove(string=head(ddrIn@rownames),pattern = "\\..*"),annotDF$ensembl_transcript_id),]
+ddrIn_head <- head(ddrIn)
+class(ddrIn_head)
+class(ddrIn)
+TRUE!=unique(annotDF$ensembl_transcript_id==str_remove(string=ddrIn@rownames,pattern = "\\..*"))
+TRUE!=unique(annotDF$ensembl_transcript_id==str_remove(string=head(ddrIn@rownames,pattern = "\\..*")))
+TRUE!=unique(annotDF$ensembl_transcript_id==str_remove(string=head(ddrIn@rownames),pattern = "\\..*"))
+annotDF$ensembl_transcript_id
+annotDF <- annotDF[match(str_remove(string=head(ddrIn@rownames),pattern = "\\..*"),annotDF$ensembl_transcript_id),]
+TRUE!=unique(annotDF$ensembl_transcript_id==str_remove(string=head(ddrIn@rownames),pattern = "\\..*"))
+annotDF$ensembl_transcript_id
+head(ddrIn@rownames)
+str_remove(string=head(ddrIn@rownames),pattern = "\\..*")
+annotDF$ensembl_transcript_id
+str_remove(string=head(ddrIn@rownames),pattern = "\\..*")==annotDF$ensembl_transcript_id
+unique(str_remove(string=head(ddrIn@rownames),pattern = "\\..*")==annotDF$ensembl_transcript_id)
+if(unique(str_remove(string=head(ddrIn@rownames),pattern = "\\..*")==annotDF$ensembl_transcript_id)!=TRUE){print("matchingnotwork")}
+if(unique(str_remove(string=head(ddrIn@rownames),pattern = "\\..*")==annotDF$ensembl_transcript_id)==TRUE){print("matchingnotwork")}
+unique(ddrObjList[["Input_High"]]@rownames==ddsObjList[["Input_High"]]@rownames)
+ddsObjList[["Input_High"]]@NAMES
+ddsObjList[["Input_High"]]@colData
+View(ddrObjList)
+View(ddsObjList)
+ddsObjList[["Input_High"]]@assays
+ddsObjList[["Input_High"]]@elementMetadata@rownames
+ddsObjList[["Input_High"]]@rowRanges@partitioning@NAMES
+unique(ddsObjList[["Input_High"]]@rowRanges@partitioning@NAMES==ddrObjList[["Input_High"]]@rownames)
+ddsObjList[["Input_High"]]@colData
+ddsObjList[["Input_High"]]@assays@data@listData$counts
+rownameS(ddsObjList[["Input_High"]]@assays@data@listData$counts)
+rownames(ddsObjList[["Input_High"]]@assays@data@listData$counts)
+unique(rownames(ddsObjList[["Input_High"]]@assays@data@listData$counts)==ddrObjList[["Input_High"]]@rownames)
+library(DESeq2)
+DESeq2::DESeqDataSet()
+?DESeq2::DESeqDataSet()
+DESeqDataSet
+unique(rownames(ddsObjList[["Input_High"]]@assays@data@listData$counts)==ddrObjList[["Input_High"]]@rownames)
+ddsObjList[["Input_High"]]@assays@data@listData$counts
+ddsObjList[["Input_High"]]@assays@data@listData$counts %>% head()
+ddshead <- head(ddsObjList[["Input_High"]])
+ddshead@assays@data@listData$counts
+ddshead@assays@data@listData$hgnc_symbol <- annotDF$hgnc_symbol
+ddshead
+ddshead@assays
+ddshead@assays@data@listData$ensembl_transcript_id <- annotDF$ensembl_transcript_id
+ddshead@assays$ensembl_transcript_id
+ddshead@assays@data$ensembl_transcript_id
+ddshead@assays@data
+assays(ddshead)
+ddshead
+ddshead@assays@data
+ddshead@assays@data$counts
+ddshead@assays@data[[c('counts','ensembl_transcript_id')]]
+ddshead@assays@data[:,c('counts','ensembl_transcript_id')]
+ddshead@assays@data[,c('counts','ensembl_transcript_id')]
+ddshead@assays@data$counts
+ddshead@assays@data$ensembl_transcript_id
+DESeq2::summary(ddshead)
+ddshead@rowRanges@partitioning@metadata <- annotDF$ensembl_transcript_id
+ddshead@rowRanges@partitioning@metadata <- [annotDF$ensembl_transcript_id]
+ddshead@rowRanges@partitioning@metadata$ensembl_transcript_id <- annotDF$ensembl_transcript_id
+ddshead
+summary(ddshead)
+ddshead@colData@metadata$ensembl_transcript_id <- annotDF$ensembl_transcript_id
+summary(ddshead)
+ddshead@assays@data@metadata$ensembl_transcript_id <- annotDF$ensembl_transcript_id
+summary(ddshead)
+View(ddshead)
+ddsheadrlog <- rlog(ddshead)
+ddsheadrlog <- rlog(ddshead,blind=FALSE)
+ddsheadrlog <- rlog(head(ddsObjList[["Input_High"]]),blind=FALSE)
+warnings()
+ddsheadrlog <- rlog(head(ddsObjList[["Input_High"]]),blind=FALSE)
+ddshead <- head(ddsObjList[["Input_High"]])
+mcols(ddshead) <- cbind(mcols(ddshead),annotDF)
+ddshead
+View(ddshead)
+ddshead@rowRanges@unlistData@elementMetadata@listData
+names(ddshead@rowRanges@unlistData@elementMetadata@listData)
+ddshead@rowRanges@unlistData@elementMetadata@listData
+ddshead@rowRanges@unlistData@elementMetadata@listData$hgnc_symbol
+ddshead@rowRanges@@elementMetadata@listData$hgnc_symbol
+ddshead@rowRanges@elementMetadata@listData
+ddshead2 <- ddshead@rowRanges@elementMetadata@listData$ensembl_transcript_id
+ddshead2
+ddshead2 <- head(ddsObjList[["Input_High"]])
+ddshead2 <- ddshead2@rowRanges@elementMetadata@listData$ensembl_transcript_id
+ddshead2
+ddshead2 <- head(ddsObjList[["Input_High"]])
+ddshead2@rowRanges@elementMetadata@listData$ensembl_transcript_id <- annotDF$ensembl_transcript_id
+ddshead2
+ddshead
+ddrhead
+ddrhead <- head(ddrObjList[["Input_High"]])
+rownames(ddrhead)
+annotdf
+annotDF$ensembl_transcript_id
+rownames(ddshead)
+ddshead
+ddrhead
+mcols(ddrhead) <- cbind(mcols(ddrhead),annotDF)
+ddrhead
+View(ddrhead)
+rownameS(ddrhead)
+rownames(ddrhead)
+ddrhead@elementMetadata@listData
+summary(ddrhead)
+metadata(ddrhead)
+plotMA(ddrhead)
+ddshead
+rownames(ddshead)
+addAttrCol <- function(obj=dds,
+attrvec = c('hgnc_symbol','ensembl_transcript_id'),
+filtvec=c('ensembl_transcript_id')){
+mart <- biomaRt::useMart('ENSEMBL_MART_ENSEMBL','hsapiens_gene_ensembl')
+vals <- rownames(obj) %>% str_remove(string=.,pattern="\\..*")
+annotDF <- getBM(attrvec,filters=filtvec,values=vals,mart)
+annotDF[match(str_remove(string=rownames(obj),pattern = "\\..*"),
+annotDF$ensembl_transcript_id),]
+if(unique(str_remove(string=res@rownames,pattern = "\\..*")==annotDF$ensembl_transcript_id)!=TRUE){
+stop('error arranging annotation DF, check it out yourself')
+}
+mcols(obj) <- cbind(mcols(obj),annotDF)
+#add functionality to get the type of transcript, i.e. protein-coding or nmd or etc
+return(obj)
+}
+ddshead <- head(ddsObjList[["Input_High"]])
+ddshead <- addAttrCol(dds)
+ddrhead <- head(ddrObjList[["Input_High"]]);ddrhead <- addAttrCol(ddrhead);ddshead <- head(ddsObjList[["Input_High"]]);ddshead <- addAttrCol(ddshead);
+addAttrCol <- function(obj=dds,
+attrvec = c('hgnc_symbol','ensembl_transcript_id'),
+filtvec=c('ensembl_transcript_id')){
+vals <- rownames(obj) %>% str_remove(string=.,pattern="\\..*")
+mart <- biomaRt::useMart('ENSEMBL_MART_ENSEMBL','hsapiens_gene_ensembl')
+annotDF <- getBM(attrvec,filters=filtvec,values=vals,mart)
+annotDF[match(str_remove(string=rownames(obj),pattern = "\\..*"),
+annotDF$ensembl_transcript_id),]
+if(unique(str_remove(string=rownames(obj),pattern = "\\..*")==annotDF$ensembl_transcript_id)!=TRUE){
+stop('error arranging annotation DF, check it out yourself')
+}
+mcols(obj) <- cbind(mcols(obj),annotDF)
+#add functionality to get the type of transcript, i.e. protein-coding or nmd or etc
+return(obj)
+}
+ddrhead <- head(ddrObjList[["Input_High"]]);ddrhead <- addAttrCol(ddrhead);ddshead <- head(ddsObjList[["Input_High"]]);ddshead <- addAttrCol(ddshead);
+addAttrCol <- function(obj=dds,
+attrvec = c('hgnc_symbol','ensembl_transcript_id'),
+filtvec=c('ensembl_transcript_id')){
+vals <- rownames(obj) %>% str_remove(string=.,pattern="\\..*")
+mart <- biomaRt::useMart('ENSEMBL_MART_ENSEMBL','hsapiens_gene_ensembl')
+annotDF <- getBM(attrvec,filters=filtvec,values=vals,mart)
+annotDF <- annotDF[match(str_remove(string=rownames(obj),pattern = "\\..*"),
+annotDF$ensembl_transcript_id),]
+if(unique(str_remove(string=rownames(obj),pattern = "\\..*")==annotDF$ensembl_transcript_id)!=TRUE){
+stop('error arranging annotation DF, check it out yourself')
+}
+mcols(obj) <- cbind(mcols(obj),annotDF)
+#add functionality to get the type of transcript, i.e. protein-coding or nmd or etc
+return(obj)
+}
+ddrhead <- head(ddrObjList[["Input_High"]]);ddrhead <- addAttrCol(ddrhead);ddshead <- head(ddsObjList[["Input_High"]]);ddshead <- addAttrCol(ddshead);
+View(ddshead2)
+View(ddshead)
+summary(ddshead)
+ddshead
+ddshead@NAMES
+ddshead
+plotPCA(ddshead)
+ddshead@rowRanges@elementMetadata@listData
+cbind(ddshead$counts,ddshead@rowRanges@elementMetadata@listData
+cbind(ddshead$counts,ddshead@rowRanges@elementMetadata@listData)
+cbind(ddshead@assays$counts,ddshead@rowRanges@elementMetadata@listData)
+ddshead@assays$counts
+ddshead@assays
+ddshead@assays@data@listData$counts
+cbind(ddshead@assays@data@listData$counts,ddshead@rowRanges@elementMetadata@listData)
+cbind(ddshead@assays@data@listData$counts,ddshead@rowRanges@elementMetadata@listData$ensembl_transcript_id)
+savehistory("C:/Users/baldr/modRIPseq/modRIPseq/history.Rproj")

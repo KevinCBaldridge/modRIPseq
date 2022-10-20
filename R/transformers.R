@@ -1,5 +1,24 @@
-# #'@title use biomaRt to translate annotation
-
+#'@title use biomaRt to translate annotation
+#'@description this function wraps biomaRt to get attributes
+#'  from the rownames of DESeqDataSet, DESeqResults,
+#'  and DESeqTransform objects, and adds them to the listData attribute
+#'@export
+addAttrCol <- function(obj=dds,
+                       attrvec = c('hgnc_symbol','ensembl_transcript_id'),
+                       filtvec=c('ensembl_transcript_id')){
+  vals <- rownames(obj) %>% str_remove(string=.,pattern="\\..*")
+  mart <- biomaRt::useMart('ENSEMBL_MART_ENSEMBL','hsapiens_gene_ensembl')
+  annotDF <- getBM(attrvec,filters=filtvec,values=vals,mart)
+  annotDF <- annotDF[match(str_remove(string=rownames(obj),pattern = "\\..*"),
+                annotDF$ensembl_transcript_id),]
+  if(unique(str_remove(string=rownames(obj),pattern = "\\..*")==annotDF$ensembl_transcript_id)!=TRUE){
+    stop('error arranging annotation DF, check it out yourself')
+  }
+  mcols(obj) <- cbind(mcols(obj),annotDF)
+  #this doesn't work with ddr type objects... works for transform and dataset, so install a switch to approach differently for res?
+  #add functionality to get the type of transcript, i.e. protein-coding or nmd or etc
+  return(obj)
+}
 
 
 
