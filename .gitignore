@@ -6,4 +6,4 @@ modRIPseq.Rproj
 R/modRIPseq_pipeline.R
 *.tiff
 *.log
-
+*.csv

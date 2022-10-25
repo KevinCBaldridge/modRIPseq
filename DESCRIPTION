@@ -20,4 +20,4 @@ Imports:
         ggplot2 (>= 3.3.6) ,
         biomaRt (>= 2.52.0) ,
         enrichR (>= 3.1) ,
-        VennDiagram (>= 1.7.3)
+        ggVennDiagram (>= 1.2.2)

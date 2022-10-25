@@ -27,35 +27,34 @@
 #'   Note that you cannot pass more than 5 comparisons in as written,
 #'   i.e. you can't compare all 6 groups that are there by default
 ############################################################
-makeVenn <- function(resList=ddrObjList,samples=c("Input_High","8OG_control_High","8OG_OAM_High")){
+makeVenn <- function(ddrsiglist=ddrSigList,samples=c("Input_High","8OG_control_High","8OG_OAM_High")){
   #extract exposure string for plot labeling
   #build the named list for feeding to venndiagram
   x <- c()
   for (NAME in samples){
-    res <- ddrObjList[[NAME]]
+    res <- ddrsiglist[[NAME]]
     x[[NAME]] <- filterTopNpadj(res,
                                 nrow(res[!is.na(res$padj)&res$padj<0.1,])
                                 ) %>%
       rownames()
 #    print(paste0(NAME,head(x[[NAME]])))
   }
-  VennDiagram::venn.diagram(as.list(x),filename=paste0("test.tiff"))
+  #names(x)[3] <- stringi::stri_replace_last_fixed(names(x)[3],"_","\n")
+  names(x)
+  p1 <- ggVennDiagram::ggVennDiagram(as.list(x),
+                                     category.names=stringi::stri_replace_last_fixed(names(x),"_","\n"),
+                                     set_color = 'black',
+                                     set_size = 3.5,
+                                     label_size = 2.5,
+                                     edge_lty="dashed",
+
+                                     )
+  p1 <- p1 + scale_x_continuous(expand = expansion(mult = .2))
+  return(p1)
 }
 ############################################################
-#Note to self, I should still edit the appearance of the venn
-#and maybe have a loop that will do both high and low, comparison between etc?
-############################################################
-#This function is clearly not ready,
-#I encountered challenges matching data with the published
-#namely, different gene counts in various bins compared to the published paper
-#note that I was very close to dissertation published number,
-#387 published there and 386 found diffExpr in my analysis
-#for high level (could be dissertation typo in figure,
-#can't be certain without access to TACC to get my original data)
-#hence I suspect a minor processing change by Juan,
-#since the paper published value is 311 - carrying forward as is for now,
-#I'll contact Juan to see if he has any ideas on the matter
-############################################################
+#This function doesn't make the prettiest venn diagram,
+#I'll come back to it later for appearance
 
 
 

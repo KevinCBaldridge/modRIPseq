@@ -9,5 +9,5 @@
 #'@import ggplot2
 #'@import biomaRt
 #'@import enrichR
-#'@import VennDiagram
+#'@import ggVennDiagram
 NULL

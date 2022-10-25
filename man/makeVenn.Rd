@@ -13,7 +13,7 @@
 #'@seealso}
 \usage{
 makeVenn(
-  resList = ddrObjList,
+  ddrsiglist = ddrSigList,
   samples = c("Input_High", "8OG_control_High", "8OG_OAM_High")
 )
 }
