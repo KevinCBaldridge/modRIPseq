@@ -24,6 +24,7 @@ ddsTfmList <- setTfmContrast()
 for (NAME in names(ddsTfmList)){plot(makePCA(ddsTfmList[[NAME]]))}
 
 #add annotation metadata from biomaRt, fetching only once for the biggest and going from there
+#note this function must feed ddr object, not others - build the others from that annotation
 ddrObjList$Input_Low <-addAttrCol(ddrObjList$Input_Low)
 for (NAME in names(ddrObjList)){
   if (NAME=="Input_Low") {
