@@ -11,6 +11,8 @@ ddsTfm(data = dds, tfm = "rlog", blind = FALSE, ...)
 
 \item{tfm}{the transformation to perform, must be one of 'rlog' (for \code{\link[DESeq2:rlog]{DESeq2::rlog()}}) or 'varStbl' (for \code{\link[DESeq2:varianceStabilizingTransformation]{DESeq2::varianceStabilizingTransformation()}}). Default is 'rlog'}
 
+\item{blind}{whether the transformation is blinded to experimental design, see documentation for \code{\link[DESeq2:rlog]{DESeq2::rlog()}} or \code{\link[DESeq2:varianceStabilizingTransformation]{DESeq2::varianceStabilizingTransformation()}} for more information. Default in this package is "FALSE"}
+
 \item{...}{any option that can be passed to \code{\link[DESeq2:rlog]{DESeq2::rlog()}} or \code{\link[DESeq2:varianceStabilizingTransformation]{DESeq2::varianceStabilizingTransformation()}}}
 }
 \value{

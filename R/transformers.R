@@ -1,7 +1,12 @@
+if(getRversion() >= "2.15.1") utils::globalVariables("dds")
+
 #'@title use biomaRt to translate annotation
 #'@description this function wraps biomaRt to get attributes
 #'  from the rownames of DESeqResults objects,
 #'  and adds them to the listData attribute
+#'@param obj DESeqResults object to transform. Defaults to object named ddr
+#'@param attrvec vector of character strings corresponding to biomaRt attributes to fetch for annotating your results object. Defaults to c('hgnc_symbol','ensembl_transcript_id')
+#'@param filtvec vector of character strings you will use for the key to select biomaRt entries for fetching annotations. Defaults to c('ensembl_transcript_id')
 #'@export
 addAttrCol <- function(obj=ddr,
                        attrvec = c('hgnc_symbol','ensembl_transcript_id'),
@@ -11,17 +16,7 @@ addAttrCol <- function(obj=ddr,
   annotDF <- getBM(attrvec,filters=filtvec,values=vals,mart)
   annotDF <- annotDF[match(str_remove(string=rownames(obj),pattern = "\\..*"),
                 annotDF$ensembl_transcript_id),]
-  # if(unique(str_remove(string=rownames(obj),pattern = "\\..*")==annotDF$ensembl_transcript_id)!=TRUE){
-  #   stop('error arranging annotation DF, check it out yourself')
-  # }
-  # if(nrow(mcols(obj))==nrow(annotDF)){
-  #   mcols(obj) <- cbind(mcols(obj),annotDF)
-  # }  else if(nrow(obj)==nrow(annotDF)){
     obj <- cbind(obj,annotDF)
-  # }  else stop('error with arranging annotation DF, check it out yourself')
-  #mcols(obj) <- cbind(mcols(obj),annotDF)
-  #this doesn't work with ddr type objects... works for transform and dataset, so install a switch to approach differently for res?
-  #add functionality to get the type of transcript, i.e. protein-coding or nmd or etc
   return(obj)
 }
 
@@ -36,6 +31,7 @@ addAttrCol <- function(obj=ddr,
 #'  Note that you should loop over your ddsObjList as shown in the third example.
 #'@param data DESeqDataSet object to transform, Default is dds
 #'@param tfm the transformation to perform, must be one of 'rlog' (for [DESeq2::rlog()]) or 'varStbl' (for [DESeq2::varianceStabilizingTransformation()]). Default is 'rlog'
+#'@param blind whether the transformation is blinded to experimental design, see documentation for [DESeq2::rlog()] or [DESeq2::varianceStabilizingTransformation()] for more information. Default in this package is "FALSE"
 #'@return the transformed DESeqDataSet object as class DESeqTransform
 #'@export
 #'@param ... any option that can be passed to [DESeq2::rlog()] or [DESeq2::varianceStabilizingTransformation()]

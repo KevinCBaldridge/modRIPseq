@@ -25,7 +25,7 @@ Additionally, this function can call a secondary function for row name checking 
 (counts, abundances, and lengths) are consistently named correctly within each file and across files
 }
 \examples{
-txi.rsem <- loadRSEMs(fileLlist)
+txi.rsem <- loadRSEMs(fileList)
 loadRSEMs(myFileList,TRUE)
 }
 \seealso{

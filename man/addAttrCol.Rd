@@ -5,13 +5,20 @@
 \title{use biomaRt to translate annotation}
 \usage{
 addAttrCol(
-  obj = dds,
+  obj = ddr,
   attrvec = c("hgnc_symbol", "ensembl_transcript_id"),
   filtvec = c("ensembl_transcript_id")
 )
 }
+\arguments{
+\item{obj}{DESeqResults object to transform. Defaults to object named ddr}
+
+\item{attrvec}{vector of character strings corresponding to biomaRt attributes to fetch for annotating your results object. Defaults to c('hgnc_symbol','ensembl_transcript_id')}
+
+\item{filtvec}{vector of character strings you will use for the key to select biomaRt entries for fetching annotations. Defaults to c('ensembl_transcript_id')}
+}
 \description{
 this function wraps biomaRt to get attributes
-from the rownames of DESeqDataSet, DESeqResults,
-and DESeqTransform objects, and adds them to the listData attribute
+from the rownames of DESeqResults objects,
+and adds them to the listData attribute
 }

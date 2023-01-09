@@ -7,7 +7,9 @@
 #'@importFrom tximport tximport
 #'@importFrom stringr str_detect str_replace_all str_replace str_split
 #'@import ggplot2
-#'@import biomaRt
+#'@importFrom biomaRt listAttributes useMart getBM
 #'@import enrichR
 #'@import ggVennDiagram
+#'@importFrom utils head read.table globalVariables
+#'@importFrom stringi stri_replace_last_fixed
 NULL

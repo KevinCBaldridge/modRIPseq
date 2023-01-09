@@ -1,3 +1,4 @@
+#if(getRversion() >= "2.15.1") utils::globalVariables("fileList")
 #factor.tbl - path to file containing tab-separated table, with column names as first row, where the first column should be the filenames, second third and fourth columns are factors with appropriate first-row labels
 #inputfilelist.txt - path to file containing newline-separated list of files that are the output files from RSEM at the transcript level. These filenames should match the filenames in the factor.tbl first column. (will add error checking to confirm this)
 
@@ -57,8 +58,8 @@ loadFileList <- function(filepath=system.file("extdata","inputfilelistAll.txt",p
 #'@param checkRowNaming (OPTIONAL) Boolean flag to check all row names within files and across files to ensure row name consistency in counts, lengths, and abundances. Defaults to FALSE.
 #'@export
 #'@return List of matrices corresponding to count, abundance, and lengths for all the count tables indicated in your input file list (same as return from tximport)
-    #'@examples
-#'txi.rsem <- loadRSEMs(fileLlist)
+#'@examples
+#'txi.rsem <- loadRSEMs(fileList)
 #'loadRSEMs(myFileList,TRUE)
 #'@seealso [tximport::tximport()] which this function wraps
 #'@seealso [modRIPseq::loadFileList()] which is the precursor to this function in the modRIPseq pipeline
@@ -76,50 +77,73 @@ loadRSEMs <- function(filelist=fileList,checkRowNaming=FALSE){
   }
   if(checkRowNaming==TRUE){
     print("Checking row naming...")
-    txi.rsem <- checkRowNaming(txi.rsem,filelist)
+    conversiontable <- read.table(sep="\t",header=TRUE,file=filelist[1],stringsAsFactors=FALSE)
+    tmp <- unique(conversiontable[,1]==rownames(txi.rsem$counts))
+    if(length(tmp)==1){
+      if(tmp!=TRUE) {
+        warning("Rownames for txi.rsem$counts are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
+        rownames(txi.rsem$counts) <- conversiontable[,1]
+      }
+    }
+    tmp <- unique(conversiontable[,1]==rownames(txi.rsem$lengths))
+    if(length(tmp)==1){
+      if(tmp!=TRUE) {
+        warning("Rownames for txi.rsem$lengths are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
+        rownames(txi.rsem$lengths) <- conversiontable[,1]
+      }
+    }
+    tmp <- unique(conversiontable[,1]==rownames(txi.rsem$abundances))
+    if(length(tmp)==1){
+      if(tmp!=TRUE) {
+        warning("Rownames for txi.rsem$abundances are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
+        rownames(txi.rsem$abundances) <- conversiontable[,1]
+      }
+    }
+    print("Row names check out")
   }
   return(txi.rsem)
 }
 
+#
 
-#'@title Row naming checks for tximport returned object
-#'@description This function will check row naming for the txi.rsem object loaded by loadRSEMs() function
-#'@details The function checks the first column of the matrices in the list returned by loadRSEMs (or another tximport return object) to ensure consistency in row names among files and the various matrices (counts, abundance, lengths)
-#'  Additionally, if the row names don't check out properly, this will rename them accordingly, but you should manually check that things are correct/consistent among the various matrices (txi.rsem$counts, txi.rsem$lengths, txi.rsem$abundance) in the list
-#'  This function generally should not be called directly, use the optional parameter checkRowNaming=TRUE into loadRSEMs() to call indirectly
-#'@param txobj the txi.rsem object loaded by loadRSEMs(). No default
-#'@param filelist the filelist passed into loadFileList() for checking rownames against. No default
-#'@export
-#'@return List of matrices corresponding to count, abundance, and lengths for all the count tables indicated in your input file list (same as return from tximport), with corrected row names if they did not pass the checks
-#'@examples
-#'txobj <- checkRowNaming(txi.rsem,fileList)
-#'@seealso [modRIPseq::loadRSEMs()] which is the function that calls this validation function
-checkRowNaming <- function(txobj,filelist){
-  conversiontable <- read.table(sep="\t",header=TRUE,file=filelist[1],stringsAsFactors=FALSE)
-  tmp <- unique(conversiontable[,1]==rownames(txobj$counts))
-  if(length(tmp)==1){
-    if(tmp!=TRUE) {
-      warning("Rownames for txi.rsem$counts are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
-      rownames(txobj$counts) <- conversiontable[,1]
-    }
-  }
-  tmp <- unique(conversiontable[,1]==rownames(txobj$lengths))
-  if(length(tmp)==1){
-    if(tmp!=TRUE) {
-      warning("Rownames for txi.rsem$lengths are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
-      rownames(txobj$lengths) <- conversiontable[,1]
-    }
-  }
-  tmp <- unique(conversiontable[,1]==rownames(txobj$abundances))
-  if(length(tmp)==1){
-    if(tmp!=TRUE) {
-      warning("Rownames for txi.rsem$abundances are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
-      rownames(txobj$abundances) <- conversiontable[,1]
-    }
-  }
-  print("Row names check out")
-  return(txobj)
-}
+# #'@title Row naming checks for tximport returned object
+# #'@description This function will check row naming for the txi.rsem object loaded by loadRSEMs() function
+# #'@details The function checks the first column of the matrices in the list returned by loadRSEMs (or another tximport return object) to ensure consistency in row names among files and the various matrices (counts, abundance, lengths)
+# #'  Additionally, if the row names don't check out properly, this will rename them accordingly, but you should manually check that things are correct/consistent among the various matrices (txi.rsem$counts, txi.rsem$lengths, txi.rsem$abundance) in the list
+# #'  This function generally should not be called directly, use the optional parameter checkRowNaming=TRUE into loadRSEMs() to call indirectly
+# #'@param txobj the txi.rsem object loaded by loadRSEMs(). No default
+# #'@param filelist the filelist passed into loadFileList() for checking rownames against. No default
+# #'@export
+# #'@return List of matrices corresponding to count, abundance, and lengths for all the count tables indicated in your input file list (same as return from tximport), with corrected row names if they did not pass the checks
+# #'@examples
+# #'txobj <- checkRowNaming(txi.rsem,fileList)
+# #'@seealso [modRIPseq::loadRSEMs()] which is the function that calls this validation function
+# checkRowNaming <- function(txobj=txi.rsem,filelist=fileList){
+#   conversiontable <- read.table(sep="\t",header=TRUE,file=filelist[1],stringsAsFactors=FALSE)
+#   tmp <- unique(conversiontable[,1]==rownames(txobj$counts))
+#   if(length(tmp)==1){
+#     if(tmp!=TRUE) {
+#       warning("Rownames for txi.rsem$counts are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
+#       rownames(txobj$counts) <- conversiontable[,1]
+#     }
+#   }
+#   tmp <- unique(conversiontable[,1]==rownames(txobj$lengths))
+#   if(length(tmp)==1){
+#     if(tmp!=TRUE) {
+#       warning("Rownames for txi.rsem$lengths are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
+#       rownames(txobj$lengths) <- conversiontable[,1]
+#     }
+#   }
+#   tmp <- unique(conversiontable[,1]==rownames(txobj$abundances))
+#   if(length(tmp)==1){
+#     if(tmp!=TRUE) {
+#       warning("Rownames for txi.rsem$abundances are not the same as first column of your tximport file, auto-assigning now... but you should manually confirm after!")
+#       rownames(txobj$abundances) <- conversiontable[,1]
+#     }
+#   }
+#   print("Row names check out")
+#   return(txobj)
+# }
 
 #'@title Reorders factor tibble to match file list
 #'@description This function will ensure the correct order of factors in the tibble according to the inputfilelist to properly match for DESeq analysis

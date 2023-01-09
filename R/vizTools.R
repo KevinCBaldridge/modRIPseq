@@ -20,10 +20,12 @@
 #' #'@seealso
 #'
 #'
-#' #suppl figure 4a - can we get
-#' #'@title Make Venn diagram plot of up/down regulated/oxidized transcripts
-#' #'@description
-#' #'@details
+#'suppl figure 4a - can we get
+#'@title Make Venn diagram plot of up/down regulated/oxidized transcripts
+#'@description This function wrapps ggVennDiagram to compare gene lists from each top-N filtered DESeqResults objects, which should be created by creating a list of named DESeqResults objects returned by [modRIPseq::filterTopNpadj()]
+#'@param ddrsiglist the list of DESeqResults objects that has been filtered to the gene lists of interest for comparing overlaps by venn diagram visualization. Defaults to ddrSigList, a list of filtered DESeqResults objects returned by [modRIPseq::filterTopNpadj()]
+#'@param samples list of character vectors that must match names in the list of DESeqResults objects for comparison in Venn diagrams. Defaults to c("Input_High","8OG_control_High","8OG_OAM_High")
+#'@details
 #'   Note that you cannot pass more than 5 comparisons in as written,
 #'   i.e. you can't compare all 6 groups that are there by default
 ############################################################

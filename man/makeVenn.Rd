@@ -2,7 +2,23 @@
 % Please edit documentation in R/vizTools.R
 \name{makeVenn}
 \alias{makeVenn}
-\title{#write to have option for high (suppl fig 10c) or low (suppl fig 9b) plot
+\title{Make Venn diagram plot of up/down regulated/oxidized transcripts}
+\usage{
+makeVenn(
+  ddrsiglist = ddrSigList,
+  samples = c("Input_High", "8OG_control_High", "8OG_OAM_High")
+)
+}
+\arguments{
+\item{ddrsiglist}{the list of DESeqResults objects that has been filtered to the gene lists of interest for comparing overlaps by venn diagram visualization. Defaults to ddrSigList, a list of filtered DESeqResults objects returned by \code{\link[=filterTopNpadj]{filterTopNpadj()}}}
+
+\item{samples}{list of character vectors that must match names in the list of DESeqResults objects for comparison in Venn diagrams. Defaults to c("Input_High","8OG_control_High","8OG_OAM_High")}
+}
+\description{
+This function wrapps ggVennDiagram to compare gene lists from each top-N filtered DESeqResults objects, which should be created by creating a list of named DESeqResults objects returned by \code{\link[=filterTopNpadj]{filterTopNpadj()}}
+}
+\details{
+#write to have option for high (suppl fig 10c) or low (suppl fig 9b) plot
 #'@title Make volcano plot for modRIPseq results
 #'@description This function will create a volcano plot for the DESeq results for modRIPseq data
 #'@details
@@ -10,14 +26,8 @@
 #'@export
 #'@return
 #'@examples
-#'@seealso}
-\usage{
-makeVenn(
-  ddrsiglist = ddrSigList,
-  samples = c("Input_High", "8OG_control_High", "8OG_OAM_High")
-)
-}
-\description{
+#'@seealso
+
 #not in paper? but part of data QC in pre-paper workup
 #'@title Make independent filtering plot
 #'@description
@@ -27,12 +37,9 @@ makeVenn(
 #'@return
 #'@examples
 #'@seealso
-}
-\details{
-#suppl figure 4a - can we get
-#'@title Make Venn diagram plot of up/down regulated/oxidized transcripts
-#'@description
-#'@details
+
+suppl figure 4a - can we get
+
 Note that you cannot pass more than 5 comparisons in as written,
 i.e. you can't compare all 6 groups that are there by default
 }
